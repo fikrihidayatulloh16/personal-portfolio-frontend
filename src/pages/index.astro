@@ -1,16 +1,392 @@
 ---
+// src/pages/index.astro
 
+// 1. Import the Sanity client that the integration configured for us.
+import { sanityClient, urlFor } from "../lib/sanityClient";
+import MainLayout from '../layouts/MainLayout.astro';
+import type { PageInfo, Skill, Education, WorkExp, Project } from "../types/sanity"; // We'll create this type file next for type safety
+
+// 2. Define the GROQ query to fetch our data.
+// We ask for the one document of type "pageInfo" and select the fields we want.
+const query = `*[_type == "pageInfo"][0]{ name, heroTitle, bio, backroundImage, profileImage, birthday, age, email, phone, degree, city }`;
+const skillsQuery = `*[_type == "skill"]`;
+const edQuery = `*[_type == "education"]`;
+const workExpQuery = `*[_type == "workExp"]`;
+const projectExpQuery = `*[_type == "project"]`;
+
+// 3. Fetch the data from Sanity using the client and the query.
+// The "---" section is called the frontmatter, it runs on the server.
+const pageInfo: PageInfo = await sanityClient.fetch(query);
+const skills: Skill[] = await sanityClient.fetch(skillsQuery);
+const educationList: Education[] = await sanityClient.fetch(edQuery);
+const workExpList: WorkExp[] = await sanityClient.fetch(workExpQuery);
+const projectList: Project[] = await sanityClient.fetch(projectExpQuery);
+
+const { name, heroTitle, bio, backroundImage, profileImage,birthday,age, email, phone, degree, city } = pageInfo;
+
+//skill logic
+const middleIndex = Math.ceil(skills.length / 2);
+const firstColumnSkills = skills.slice(0, middleIndex);
+const secondColumnSkills = skills.slice(middleIndex);
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<MainLayout>
+<!-- Hero Section -->
+  <section id="hero" class="hero section dark-background">
+
+    <img src={urlFor(backroundImage).url()} alt="" data-aos="fade-in" class="">
+
+    <div class="container" data-aos="fade-up" data-aos-delay="100">
+      <h2>{name}</h2>
+      <p>I'm <span class="typed" data-typed-items="Backend Developer, Data Scientist"></span><span class="typed-cursor typed-cursor--blink" aria-hidden="true"></span><span class="typed-cursor typed-cursor--blink" aria-hidden="true"></span></p>
+    </div>
+
+  </section><!-- /Hero Section -->
+
+  <!-- About Section -->
+  <section id="about" class="about section">
+
+    <!-- Section Title -->
+    <div class="container section-title" data-aos="fade-up">
+      <h2>About</h2>
+      <p>{bio}</p>
+    </div><!-- End Section Title -->
+
+    <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+      <div class="row gy-4 justify-content-center">
+        <div class="col-lg-4">
+          <img src={urlFor(profileImage).url()} class="img-fluid" alt="">
+        </div>
+        <div class="col-lg-8 content">
+          <!-- <h2>UI/UX Designer &amp; Web Developer.</h2> -->
+          <h2>{heroTitle}</h2>
+          <p class="fst-italic py-3">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
+            magna aliqua.
+          </p>
+          <div class="row">
+            <div class="col-lg-6">
+              <ul>
+                <li><i class="bi bi-chevron-right"></i> <strong>Birthday:</strong> <span>{birthday}</span></li>
+                <li><i class="bi bi-chevron-right"></i> <strong>Website:</strong> <span>www.example.com</span></li>
+                <li><i class="bi bi-chevron-right"></i> <strong>Phone:</strong> <span>{phone}</span></li>
+                <li><i class="bi bi-chevron-right"></i> <strong>City:</strong> <span>{city}</span></li>
+              </ul>
+            </div>
+            <div class="col-lg-6">
+              <ul>
+                <li><i class="bi bi-chevron-right"></i> <strong>Age:</strong> <span>{age}</span></li>
+                <li><i class="bi bi-chevron-right"></i> <strong>Degree:</strong> <span>{degree}</span></li>
+                <li><i class="bi bi-chevron-right"></i> <strong>Email:</strong> <span>{email}</span></li>
+                <li><i class="bi bi-chevron-right"></i> <strong>Freelance:</strong> <span>Available</span></li>
+              </ul>
+            </div>
+          </div>
+          <p class="py-3">
+            Officiis eligendi itaque labore et dolorum mollitia officiis optio vero. Quisquam sunt adipisci omnis et ut. Nulla accusantium dolor incidunt officia tempore. Et eius omnis.
+            Cupiditate ut dicta maxime officiis quidem quia. Sed et consectetur qui quia repellendus itaque neque.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </section><!-- /About Section -->
+
+  <!-- Skills Section -->
+  <section id="skills" class="skills section light-background">
+
+    <!-- Section Title -->
+    <div class="container section-title" data-aos="fade-up">
+      <h2>Skills</h2>
+      <p>Here what i've learned</p>
+    </div><!-- End Section Title -->
+
+    <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+      <div class="row skills-content skills-animation">
+
+        <div class="col-lg-6">
+          {firstColumnSkills.map((skill) => (
+            <div class="skill-item">
+              <img 
+                src={urlFor(skill.logo).width(60).url()} 
+                alt={`${skill.name} logo`}
+              />
+              <span>{skill.name}</span>
+            </div>
+          ))}
+        </div>
+
+        <div class="col-lg-6">
+          {secondColumnSkills.map((skill) => (
+            <div class="skill-item">
+              <img 
+                src={urlFor(skill.logo).width(60).url()} 
+                alt={`${skill.name} logo`}
+              />
+              <span>{skill.name}</span>
+            </div>
+          ))}
+        </div>
+
+      </div>
+
+    </div>
+
+  </section><!-- /Skills Section -->
+
+  <!-- Resume Section -->
+  <section id="resume" class="resume section">
+
+    <!-- Section Title -->
+    <div class="container section-title" data-aos="fade-up">
+      <h2>Resume</h2>
+      <p>Magnam dolores commodi suscipit. Necessitatibus eius consequatur ex aliquid fuga eum quidem. Sit sint consectetur velit. Quisquam quos quisquam cupiditate. Et nemo qui impedit suscipit alias ea. Quia fugiat sit in iste officiis commodi quidem hic quas.</p>
+    </div><!-- End Section Title -->
+
+    <div class="container">
+
+      <div class="row">
+
+        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+          <!--
+          <h3 class="resume-title">Sumary</h3> 
+          <div class="resume-item pb-0">
+            <h4>Brandon Johnson</h4>
+            <p><em>Innovative and deadline-driven Graphic Designer with 3+ years of experience designing and developing user-centered digital/print marketing material from initial concept to final, polished deliverable.</em></p>
+            <ul>
+              <li>Portland par 127,Orlando, FL</li>
+              <li>(123) 456-7891</li>
+              <li>alice.barkley@example.com</li>
+            </ul>
+          </div>
+          -->
+
+          <h3 class="resume-title">Education</h3>
+          
+          {educationList.map((educations) => (
+            <div class="resume-item">
+              <h4>{educations.degree} {educations.major}</h4>
+              <h5>{educations.graduationDate}</h5>
+              <p><em>Institution : {educations.institutionname}</em></p>
+            </div>
+          ))} <!-- Edn Resume Item -->
+        </div>
+
+        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
+          <h3 class="resume-title">Professional Experience</h3>
+
+          {workExpList.map((workExps) => (
+            <div class="resume-item">
+              <h4>{workExps.role}</h4>
+              <h5>{workExps.startDate} - {workExps.endDate}</h5>
+              <p><em>{workExps.companyName} </em></p>
+              <ul>
+                {workExps.description}
+              </ul>
+            </div>
+          ))} <!-- Enn Resume Item -->
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section><!-- /Resume Section -->
+
+  <!-- Portfolio Section -->
+  <section id="portfolio" class="portfolio section light-background">
+
+    <!-- Section Title -->
+    <div class="container section-title" data-aos="fade-up">
+      <h2>Portfolio</h2>
+      <p>Magnam dolores commodi suscipit. Necessitatibus eius consequatur ex aliquid fuga eum quidem. Sit sint consectetur velit. Quisquam quos quisquam cupiditate. Et nemo qui impedit suscipit alias ea. Quia fugiat sit in iste officiis commodi quidem hic quas.</p>
+    </div><!-- End Section Title -->
+
+    <div class="container">
+
+      <div class="isotope-layout" data-default-filter="*" data-layout="masonry" data-sort="original-order">
+
+        <ul class="portfolio-filters isotope-filters" data-aos="fade-up" data-aos-delay="100">
+          <li data-filter="*" class="filter-active">All</li>
+          <li data-filter=".filter-app">App</li>
+          <li data-filter=".filter-product">Product</li>
+          <li data-filter=".filter-branding">Branding</li>
+          <li data-filter=".filter-books">Books</li>
+        </ul><!-- End Portfolio Filters -->
+
+        <div class="row gy-4 isotope-container" data-aos="fade-up" data-aos-delay="200">
+
+          {projectList.map((projects) => (
+          <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-app">
+            <div class="portfolio-content h-100">
+              <img src={urlFor(projects.mainImage).url()} class="img-fluid" alt=""/>
+              <div class="portfolio-info">
+                <h4>{projects.title}</h4>
+                <p>{projects.imageText}</p>
+                <a href={urlFor(projects.mainImage).url()} title={projects.imageText} data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
+                <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
+              </div>
+            </div>
+          </div>
+          ))} <!-- Enn Portfolio Item -->
+
+        </div><!-- End Portfolio Container -->
+
+      </div>
+
+    </div>
+
+  </section><!-- /Portfolio Section -->
+
+  <!-- Certificate Section -->
+  <section id="portfolio" class="portfolio section light-background">
+
+    <!-- Section Title -->
+    <div class="container section-title" data-aos="fade-up">
+      <h2>Portfolio</h2>
+      <p>Magnam dolores commodi suscipit. Necessitatibus eius consequatur ex aliquid fuga eum quidem. Sit sint consectetur velit. Quisquam quos quisquam cupiditate. Et nemo qui impedit suscipit alias ea. Quia fugiat sit in iste officiis commodi quidem hic quas.</p>
+    </div><!-- End Section Title -->
+
+    <div class="container">
+
+      <div class="isotope-layout" data-default-filter="*" data-layout="masonry" data-sort="original-order">
+
+        <ul class="portfolio-filters isotope-filters" data-aos="fade-up" data-aos-delay="100">
+          <li data-filter="*" class="filter-active">All</li>
+          <li data-filter=".filter-app">App</li>
+          <li data-filter=".filter-product">Product</li>
+          <li data-filter=".filter-branding">Branding</li>
+          <li data-filter=".filter-books">Books</li>
+        </ul><!-- End Portfolio Filters -->
+
+        <div class="row gy-4 isotope-container" data-aos="fade-up" data-aos-delay="200">
+
+          {projectList.map((projects) => (
+          <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-app">
+            <div class="portfolio-content h-100">
+              <img src={urlFor(projects.mainImage).url()} class="img-fluid" alt=""/>
+              <div class="portfolio-info">
+                <h4>{projects.title}</h4>
+                <p>{projects.imageText}</p>
+                <a href={urlFor(projects.mainImage).url()} title={projects.imageText} data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
+                <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
+              </div>
+            </div>
+          </div>
+          ))} <!-- Enn Certificate Item -->
+
+        </div><!-- End Certificate Container -->
+
+      </div>
+
+    </div>
+
+  </section><!-- /Portfolio Section -->
+
+  <!-- Contact Section -->
+  <section id="contact" class="contact section">
+
+    <!-- Section Title -->
+    <div class="container section-title" data-aos="fade-up">
+      <h2>Contact</h2>
+      <!-- <p>Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit</p> -->
+    </div><!-- End Section Title -->
+
+    <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+      <div class="row gy-4">
+
+        <div class="col-lg-5">
+
+          <div class="info-wrap">
+            <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="200">
+              <i class="bi bi-geo-alt flex-shrink-0"></i>
+              <div>
+                <h3>Address</h3>
+                <p>{city}</p>
+              </div>
+            </div><!-- End Info Item -->
+
+            <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="300">
+              <i class="bi bi-telephone flex-shrink-0"></i>
+              <div>
+                <h3>Call</h3>
+                <p>{phone}</p>
+              </div>
+            </div><!-- End Info Item -->
+
+            <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="400">
+              <i class="bi bi-envelope flex-shrink-0"></i>
+              <div>
+                <h3>Email</h3>
+                <p>{email}</p>
+              </div>
+            </div><!-- End Info Item -->
+
+            <!-- <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d48389.78314118045!2d-74.006138!3d40.710059!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25a22a3bda30d%3A0xb89d1fe6bc499443!2sDowntown%20Conference%20Center!5e0!3m2!1sen!2sus!4v1676961268712!5m2!1sen!2sus" frameborder="0" style="border:0; width: 100%; height: 270px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe> -->
+          </div>
+        </div>
+
+        <!-- 
+        <div class="col-lg-7">
+          <form action="forms/contact.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
+            <div class="row gy-4">
+
+              <div class="col-md-6">
+                <label for="name-field" class="pb-2">Your Name</label>
+                <input type="text" name="name" id="name-field" class="form-control" required="">
+              </div>
+
+              <div class="col-md-6">
+                <label for="email-field" class="pb-2">Your Email</label>
+                <input type="email" class="form-control" name="email" id="email-field" required="">
+              </div>
+
+              <div class="col-md-12">
+                <label for="subject-field" class="pb-2">Subject</label>
+                <input type="text" class="form-control" name="subject" id="subject-field" required="">
+              </div>
+
+              <div class="col-md-12">
+                <label for="message-field" class="pb-2">Message</label>
+                <textarea class="form-control" name="message" rows="10" id="message-field" required=""></textarea>
+              </div>
+
+              <div class="col-md-12 text-center">
+                <div class="loading">Loading</div>
+                <div class="error-message"></div>
+                <div class="sent-message">Your message has been sent. Thank you!</div>
+
+                <button type="submit">Send Message</button>
+              </div>
+
+            </div>
+          </form>
+        </div>--><!-- End Contact Form -->
+
+      </div>
+
+    </div>
+
+  </section><!-- /Contact Section -->
+
+  <style>
+    .skill-item {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Creates space between the logo and the name */
+    margin-bottom: 20px; /* Creates space between each skill item */
+    font-size: 1.1rem;
+  }
+
+  .skill-item img {
+    width: 60px; /* Match the width from the urlFor function */
+    height: 60px;
+    object-fit: contain; /* Ensures the logo is not stretched */
+  }
+  </style>
+</MainLayout>
