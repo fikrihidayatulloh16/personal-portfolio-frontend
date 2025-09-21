@@ -5,8 +5,8 @@ import type { SanityImage } from "../types/sanity"; // Import your SanityImage t
 
 export const sanityClient = createClient({
   // Find these in your sanity.cli.ts file or at manage.sanity.io
-  projectId: "ubgedpgo",
-  dataset: "production",
+  projectId: import.meta.env.PUBLIC_SANITY_PROJECT_ID,
+  dataset: import.meta.env.PUBLIC_SANITY_DATASET,
   apiVersion: "2025-09-19", // use a UTC date string
   useCdn: false, // `false` if you want to ensure fresh data
 });

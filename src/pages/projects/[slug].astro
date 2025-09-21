@@ -1,0 +1,132 @@
+---
+// src/pages/projects/[slug].astro
+import MainLayout from '../../layouts/MainLayout.astro';
+import { sanityClient, urlFor } from '../../lib/sanityClient';
+import type { Project } from "../../types/sanity";
+import { PortableText } from 'astro-portabletext';
+
+// This part is correct and does not need to change
+export async function getStaticPaths() {
+  const query = `*[_type == "project" && defined(slug.current)]{ "slug": slug.current }`;
+  const projects = await sanityClient.fetch(query);
+
+  return projects.map((project: { slug: string }) => ({
+    params: { slug: project.slug },
+  }));
+}
+
+// 2. Get the specific project data for this page
+const { slug } = Astro.params;
+// THE FIX IS HERE: Added [0] to the end of the query
+const query = `*[_type == "project" && slug.current == $slug][0]{
+  ..., // This keeps all your other fields like title, description, etc.
+  
+  // This is the new, important part:
+  "tech": tech[]->{
+    _id,
+    name // Or 'name', whatever the text field is called in your 'technology' schema
+  }
+}`;
+const projectList: Project = await sanityClient.fetch(query, { slug });
+
+
+
+// Now 'project' is an object, and this destructuring will work!
+const { title, descriptions, mainImage, imageText, client, category, projectDate, gallery, tech } = projectList;
+
+console.log('Fetched Project Data:', projectList);
+---
+
+<MainLayout>
+  <!-- Page Title -->
+  <div class="page-title dark-background">
+    <div class="container d-lg-flex justify-content-between align-items-center">
+      <h1 class="mb-2 mb-lg-0">Portfolio Details</h1>
+      <nav class="breadcrumbs">
+        <ol>
+          <li><a href="../#portfolio">Home</a></li>
+          <li class="current">Portfolio Details</li>
+        </ol>
+      </nav>
+    </div>
+  </div><!-- End Page Title -->
+
+  <!-- Portfolio Details Section -->
+  <section id="portfolio-details" class="portfolio-details section">
+
+    <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+      <div class="row gy-4">
+
+        <div class="col-lg-8">
+          <div class="portfolio-details-slider swiper init-swiper">
+
+            <script type="application/json" class="swiper-config">
+              {
+                "loop": true,
+                "speed": 600,
+                "autoplay": {
+                  "delay": 5000
+                },
+                "slidesPerView": "auto",
+                "pagination": {
+                  "el": ".swiper-pagination",
+                  "type": "bullets",
+                  "clickable": true
+                }
+              }
+            </script>
+
+            <div class="swiper-wrapper align-items-center">
+  
+            <div class="swiper-slide">
+                <img src={urlFor(mainImage).url()} alt="">
+              </div>
+              
+              {/* Check and loop through the single 'project' object's gallery */}
+              {projectList.gallery && projectList.gallery.length > 0 && (
+                projectList.gallery.map((galleryImage) => (
+                  <div class="swiper-slide">
+                    <img src={urlFor(galleryImage).url()} alt=""/>
+                  </div>
+                ))
+              )}
+
+            </div>
+
+            <div class="swiper-pagination"></div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="portfolio-info" data-aos="fade-up" data-aos-delay="200">
+            <h3>Project information</h3>
+            <ul>
+              <li><strong>Category</strong>: {category}</li>
+              <li><strong>Client</strong>: {client}</li>
+              <li><strong>Project date</strong>: {projectDate}</li>
+              <!-- <li><strong>Project URL</strong>: <a href="#">www.example.com</a></li>-->
+              <li><strong>Technologies</strong>: 
+                {projectList.tech.map((techs) => (
+                  <span>
+                  {techs.name};
+                  </span>
+                ))}
+              </li>
+            </ul>
+          </div>
+          
+          <div class="description portfolio-description" data-aos="fade-up" data-aos-delay="300">
+            <h2>{title}</h2>
+            <p>
+              <PortableText value={descriptions} />
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section><!-- /Portfolio Details Section -->
+</MainLayout>

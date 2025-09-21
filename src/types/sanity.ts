@@ -1,5 +1,6 @@
 // src/types/sanity.ts
-
+import type { PortableTextBlock } from '@portabletext/types';
+import type { SanityImageSource } from "@sanity/image-url/lib/types/types";
 import type { Slug } from "sanity";
 
 // A reusable type for Sanity image objects
@@ -19,17 +20,17 @@ export interface SocialLink  {
 
 export interface Technologies  {
   _type: 'object';
-  skill: string;
+  name: string;
 }
 
 export interface ProjectGalery  {
   _type: 'object';
-  image: SanityImage;
+  image: SanityImage[];
 }
 
 export interface PageInfo {
   name: string;
-  callName: string;
+  callname: string;
   heroTitle: string;
   heroList: string;
   bio: string;
@@ -61,20 +62,33 @@ export interface WorkExp {
   companyName: string;
   startDate:Date;
   endDate: Date;
-  description: Text;
+  description: PortableTextBlock[];
 }
 
 export interface Project {
   title: string;
-  slug: Slug;
+  slug: {
+    _type: 'slug';
+    current: string;
+  };
   category: string;
   client: string;
   projectDate:Date;
   mainImage: SanityImage;
   imageText: string;
-  gallery: ProjectGalery;
+  gallery: SanityImage[];
   videourl: URL;
-  description: Text;
-  tech: Technologies;
+  descriptions: PortableTextBlock[];
+  tech: Technologies [];
   githuburl: URL;
+}
+
+export interface Certificate {
+  name: string;
+  category: string;
+  issuingOrganization: string;
+  dateIssued:Date;
+  credentialUrl: URL;
+  certificateFile: File;
+  previewImage: SanityImage;
 }
