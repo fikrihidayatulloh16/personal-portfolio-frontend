@@ -1,3 +1,55 @@
+# Dynamic Static Personal Portofolio Project
+
+This repository is the frontend for my personal portfolio, built with Astro and connected to a Sanity.io backend for content management.
+
+## Tehnologies
+
+- Javascript
+- Astro
+- Vite JS
+- HTML, CSS
+- Boostrap
+- Vercel
+
+## features
+
+the core of this stack is vercel and astro. vercel can make deployment easy and astro are supported by vercel, therefore this stack can make front-end development easy. and most of all it all free. vercel can make integration with github when developer changes the data and code using hook.
+
+## AI Support
+
+this front end development assisted with many AI included granite from IBM playground.
+
+## Pre requisites
+
+* [Node.js](https://nodejs.org/) (v18 or higher)
+* [npm](https://www.npmjs.com/)
+
+---
+
+## Setup Instruction
+
+### 1 Clone repo
+
+git clone repository
+cd after cloning
+
+### 2 Install Dependencies from package.json
+
+npm install
+
+## 3 run development
+
+- create .env on root project
+- add this code to .env
+
+PUBLIC_SANITY_PROJECT_ID="your_project_id_here"
+PUBLIC_SANITY_DATASET="your_dataset_name_here"
+
+(those variable can found in sanity,json)
+
+- npm run dev (run development on local server)
+
+here the complete guide from astro
 # Astro Starter Kit: Minimal
 
 ```sh
