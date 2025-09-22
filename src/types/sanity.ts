@@ -18,14 +18,21 @@ export interface SocialLink  {
   url: string;
 }
 
+export interface SkillReference {
+  _id: string;
+  name: string;
+}
+
 export interface Technologies  {
   _type: 'object';
-  name: string;
+  tech: SkillReference;
+  techDescription: string;
 }
 
 export interface ProjectGalery  {
   _type: 'object';
-  image: SanityImage[];
+  projectgallery: SanityImage;
+  alt: 'string'
 }
 
 export interface PageInfo {
@@ -76,7 +83,7 @@ export interface Project {
   projectDate:Date;
   mainImage: SanityImage;
   imageText: string;
-  gallery: SanityImage[];
+  gallery: ProjectGalery[];
   videourl: URL;
   descriptions: PortableTextBlock[];
   tech: Technologies [];

@@ -19,12 +19,13 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 // THE FIX IS HERE: Added [0] to the end of the query
 const query = `*[_type == "project" && slug.current == $slug][0]{
-  ..., // This keeps all your other fields like title, description, etc.
-  
-  // This is the new, important part:
-  "tech": tech[]->{
-    _id,
-    name // Or 'name', whatever the text field is called in your 'technology' schema
+  ...,
+  "tech": tech[]{
+    techDescription,
+    tech->{
+      _id,
+      name 
+    }
   }
 }`;
 const projectList: Project = await sanityClient.fetch(query, { slug });
@@ -79,16 +80,23 @@ console.log('Fetched Project Data:', projectList);
 
             <div class="swiper-wrapper align-items-center">
   
-            <div class="swiper-slide">
-                <img src={urlFor(mainImage).url()} alt="">
+              <div class="swiper-slide">
+                <a href={urlFor(mainImage).url()} class="glightbox" data-gallery="project-gallery" data-description={imageText || 'Main project image'}>
+                  <img src={urlFor(mainImage).width(800).url()} alt={imageText || 'Main project image'}>
+                </a>
+                <p class="center">{imageText || 'Main project image'}</p>
               </div>
               
-              {/* Check and loop through the single 'project' object's gallery */}
               {projectList.gallery && projectList.gallery.length > 0 && (
                 projectList.gallery.map((galleryImage) => (
-                  <div class="swiper-slide">
-                    <img src={urlFor(galleryImage).url()} alt=""/>
-                  </div>
+                  galleryImage && (
+                    <div class="swiper-slide">
+                      <a href={urlFor(galleryImage.projectgallery).url()} class="glightbox" data-gallery="project-gallery" data-description={galleryImage.alt || ''}>
+                        <img src={urlFor(galleryImage.projectgallery).width(800).url()} alt={galleryImage.alt || 'Project Gallery image'}/>
+                      </a>
+                      <p class="center mt-2">{galleryImage.alt || 'Project Gallery image'}</p>
+                    </div>
+                  )
                 ))
               )}
 
@@ -99,25 +107,35 @@ console.log('Fetched Project Data:', projectList);
         </div>
 
         <div class="col-lg-4">
+           <h2>{title}</h2><br>
           <div class="portfolio-info" data-aos="fade-up" data-aos-delay="200">
             <h3>Project information</h3>
             <ul>
               <li><strong>Category</strong>: {category}</li>
               <li><strong>Client</strong>: {client}</li>
               <li><strong>Project date</strong>: {projectDate}</li>
-              <!-- <li><strong>Project URL</strong>: <a href="#">www.example.com</a></li>-->
               <li><strong>Technologies</strong>: 
-                {projectList.tech.map((techs) => (
-                  <span>
-                  {techs.name};
-                  </span>
-                ))}
+              {projectList.tech.map((techItem) => (
+    
+                // THIS CHECK IS ESSENTIAL: It skips null/broken references.
+                techItem && (
+                  <ul>
+                    <li><strong>
+                      - {techItem.tech?.name}:
+                    </strong>
+                    <span> {techItem.techDescription}</span>
+                    </li>
+                  </ul>
+                )
+
+              ))}
               </li>
+              
             </ul>
           </div>
           
           <div class="description portfolio-description" data-aos="fade-up" data-aos-delay="300">
-            <h2>{title}</h2>
+            <h3>Description :</h3>
             <p>
               <PortableText value={descriptions} />
             </p>
