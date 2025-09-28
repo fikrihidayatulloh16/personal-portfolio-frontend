@@ -32,7 +32,12 @@ export interface Technologies  {
 export interface ProjectGalery  {
   _type: 'object';
   projectgallery: SanityImage;
-  alt: 'string'
+  alt: 'string';
+}
+
+export interface features{
+  _type: 'object';
+  featureName: 'string';
 }
 
 export interface PageInfo {
@@ -86,6 +91,7 @@ export interface Project {
   gallery: ProjectGalery[];
   videourl: URL;
   descriptions: PortableTextBlock[];
+  feature: features[];
   tech: Technologies [];
   githuburl: URL;
 }

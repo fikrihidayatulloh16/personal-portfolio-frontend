@@ -33,7 +33,7 @@ const projectList: Project = await sanityClient.fetch(query, { slug });
 
 
 // Now 'project' is an object, and this destructuring will work!
-const { title, descriptions, mainImage, imageText, client, category, projectDate, gallery, tech } = projectList;
+const { title, descriptions, mainImage, imageText, client, category, projectDate, feature } = projectList;
 
 console.log('Fetched Project Data:', projectList);
 ---
@@ -130,7 +130,20 @@ console.log('Fetched Project Data:', projectList);
 
               ))}
               </li>
-              
+              <li><strong>Features: </strong>:
+              {projectList.feature.map((featureItem) => (
+    
+                // THIS CHECK IS ESSENTIAL: It skips null/broken references.
+                featureItem && (
+                  <ul>
+                    <li>
+                      - {featureItem.featureName}:
+                    </li>
+                  </ul>
+                )
+
+              ))}
+              </li>
             </ul>
           </div>
           
