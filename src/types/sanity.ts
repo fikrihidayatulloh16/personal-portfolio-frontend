@@ -23,6 +23,11 @@ export interface SkillReference {
   name: string;
 }
 
+export interface CatReference {
+  _id: string;
+  title: string;
+}
+
 export interface Technologies  {
   _type: 'object';
   tech: SkillReference;
@@ -98,7 +103,7 @@ export interface Project {
 
 export interface Certificate {
   name: string;
-  category: string;
+  category: CatReference;
   issuingOrganization: string;
   dateIssued:Date;
   credentialUrl: URL;

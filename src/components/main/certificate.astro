@@ -1,0 +1,151 @@
+---
+// import neccesary file
+import { sanityClient, urlFor } from "../../lib/sanityClient";
+import type { Certificate } from "../../types/sanity";
+
+//initiate query
+const certificateQuery = `*[_type == "cert"]{
+  ..., // This gets all the other fields like name, dateIssued, etc.
+  "fileURL": certificateFile.asset->url,
+  
+  category->{ // <-- THIS IS THE FIX: Follow the reference...
+    title      // <-- ...and get the title field from the category document.
+  },
+  
+  previewImage
+}`;
+
+//fetching queries
+const certificateList: Certificate[] = await sanityClient.fetch(certificateQuery);
+
+// --- NEW LOGIC FOR UNIQUE CATEGORIES ---
+const allCategories = certificateList.map(cert => cert.category.title).filter(Boolean);
+console.log(allCategories);
+
+const uniqueCategoryTitles = [...new Set(allCategories)];
+
+const categories = uniqueCategoryTitles.map(title => ({
+  title: title,
+  slug: title.toLowerCase().replace(/\s+/g, '-') // "Data Science" -> "data-science"
+}));
+// --- END NEW LOGIC ---
+
+const initialCount = 6;
+
+---
+
+<!-- Certificate Section -->
+  <section id="certificate" class="portfolio section light-background">
+
+    <!-- Section Title -->
+    <div class="container section-title" data-aos="fade-up">
+      <h2>Training Certificate</h2>
+      <p>Since study in computer major in informatic engineering, I interested training anything about programming, especially backend-developer and data, therefore i train my skill in other instance with certificate to approve and improve my skill.</p>
+    </div><!-- End Section Title -->
+
+    <div class="container">
+      <div id="certificate-gallery" class="isotope-layout" data-default-filter="*" data-layout="masonry" data-sort="original-order">
+
+        <ul class="portfolio-filters isotope-filters" data-aos="fade-up" data-aos-delay="100">
+          <li data-filter="*" class="filter-active">All</li>
+          
+          {categories.map((cat) => (
+            <li data-filter={`.filter-${cat.slug}`}>{cat.title}</li>
+          ))}
+        </ul>
+
+        <div class="row gy-4 isotope-container" data-aos="fade-up" data-aos-delay="200">
+          {certificateList.map((certificate, index) => {
+            const categorySlug = certificate.category?.title.toLowerCase().replace(/\s+/g, '-');
+            // Add the 'item-hidden' class if the index is past the initial count
+            const isHidden = index >= initialCount ? 'item-hidden' : '';
+            return (
+              <div class={`col-lg-4 col-md-6 portfolio-item isotope-item ${isHidden} filter-${categorySlug}`}>
+                <div class="portfolio-content h-100">
+                  <img src={urlFor(certificate.previewImage).url()} class="img-fluid" alt=""/>
+                  <div class="portfolio-info">
+                    <h4>{certificate.issuingOrganization}</h4>
+                    <p>{certificate.name}</p>
+                    <a href={urlFor(certificate.previewImage).url()} title={certificate.name} data-gallery={`portfolio-gallery-${categorySlug}`} class="glightbox preview-link">
+                      <i class="bi bi-zoom-in"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )
+          })} 
+        </div>
+      </div>
+
+      <div class="text-center mt-4">
+        <button id="show-more-items" class="btn btn-primary">Show More</button>
+      </div>
+    </div>
+
+  </section><!-- /Certificate Section -->
+
+<script>
+  // Tell TypeScript that Isotope is a global variable
+  declare const Isotope: any;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const certGallery = document.getElementById('certificate-gallery');
+    if (!certGallery) return;
+
+    const isoContainer = certGallery.querySelector('.isotope-container');
+    const filters = certGallery.querySelector('.isotope-filters');
+    const toggleButton = certGallery.querySelector('#show-more-items');
+
+    if (!isoContainer) return;
+
+    // Initialize Isotope
+    const iso = new Isotope(isoContainer, {
+      itemSelector: '.isotope-item',
+      layoutMode: 'masonry'
+    });
+
+    // Handle filter clicks
+    if (filters) {
+      filters.addEventListener('click', (e) => {
+        if (!(e.target instanceof HTMLElement) || !e.target.matches('li')) return;
+        const target = e.target;
+        
+        const filterValue = target.getAttribute('data-filter');
+        if (filterValue) {
+          iso.arrange({ filter: filterValue });
+        }
+
+        const currentActive = filters.querySelector('.filter-active');
+        if (currentActive) currentActive.classList.remove('filter-active');
+        target.classList.add('filter-active');
+      });
+    }
+
+    // "Show More" logic
+    if (toggleButton instanceof HTMLElement) {
+      toggleButton.addEventListener('click', () => {
+        // Find all hidden items and reveal them
+        const hiddenItems = certGallery.querySelectorAll('.hidden-item');
+        hiddenItems.forEach(item => {
+          item.classList.remove('hidden-item');
+        });
+        
+        // --- THIS IS THE FIX ---
+        // Find the currently active filter button
+        const activeFilterButton = filters?.querySelector('.filter-active');
+        const currentFilter = activeFilterButton?.getAttribute('data-filter') || '*';
+
+        // Tell Isotope to re-layout the items using the CURRENT filter
+        iso.arrange({ filter: currentFilter });
+        // --- END OF FIX ---
+        
+        // Hide the "Show More" button
+        toggleButton.style.display = 'none';
+      });
+    }
+  });
+</script>
+
+<style>
+  .hidden-item { display: none; }
+</style>

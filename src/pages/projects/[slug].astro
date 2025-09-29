@@ -34,8 +34,6 @@ const projectList: Project = await sanityClient.fetch(query, { slug });
 
 // Now 'project' is an object, and this destructuring will work!
 const { title, descriptions, mainImage, imageText, client, category, projectDate, feature } = projectList;
-
-console.log('Fetched Project Data:', projectList);
 ---
 
 <MainLayout>

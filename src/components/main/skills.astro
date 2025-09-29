@@ -1,0 +1,123 @@
+---
+// src/components/Skills.astro
+import { sanityClient, urlFor } from "../../lib/sanityClient";
+import type { Skill } from "../../types/sanity";
+
+// All the data logic for this section is now inside the component
+const skillsQuery = `*[_type == "skill"]`;
+const skills: Skill[] = await sanityClient.fetch(skillsQuery);
+
+const middleIndex = Math.ceil(skills.length / 2);
+const firstColumnSkills = skills.slice(0, middleIndex);
+const secondColumnSkills = skills.slice(middleIndex);
+
+const initialCount = 3;
+const firstColumnInitial = firstColumnSkills.slice(0, initialCount);
+const firstColumnHidden = firstColumnSkills.slice(initialCount);
+const secondColumnInitial = secondColumnSkills.slice(0, initialCount);
+const secondColumnHidden = secondColumnSkills.slice(initialCount);
+---
+
+ <!-- Skills Section -->
+<section id="skills" class="skills section light-background">
+  <div class="container section-title" data-aos="fade-up">
+    <h2>Skills</h2>
+    <p>Here the skill i've gained. I am willing and ready to get more skill from work.</p>
+  </div>
+  
+  <div class="container" data-aos="fade-up" data-aos-delay="100">
+    <div class="row skills-content skills-animation">
+
+        <div class="col-lg-6">
+            {firstColumnInitial.map((skill) => (
+            <div class="skill-item">
+                <img 
+                src={urlFor(skill.logo).width(60).url()} 
+                alt={`${skill.name} logo`}
+                />
+                <span>{skill.name}</span>
+            </div>
+            ))}
+
+            <div class="hidden-skills">
+            {firstColumnHidden.map((skill) => (
+                <div class="skill-item">
+                <img 
+                    src={urlFor(skill.logo).width(60).url()} 
+                    alt={`${skill.name} logo`}
+                />
+                <span>{skill.name}</span>
+                </div>
+            ))}
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            {secondColumnInitial.map((skill) => (
+            <div class="skill-item">
+                <img 
+                src={urlFor(skill.logo).width(60).url()} 
+                alt={`${skill.name} logo`}
+                />
+                <span>{skill.name}</span>
+            </div>
+            ))}
+
+            <div class="hidden-skills">
+            {secondColumnHidden.map((skill) => (
+                <div class="skill-item">
+                <img 
+                    src={urlFor(skill.logo).width(60).url()} 
+                    alt={`${skill.name} logo`}
+                />
+                <span>{skill.name}</span>
+                </div>
+            ))}
+            </div>
+        </div>
+
+    </div>
+
+    <div class="text-center mt-4">
+      <button id="show-more-skills" class="btn btn-primary">Show More</button>
+    </div>
+  </div>
+</section>
+
+<script>
+  const toggleButton = document.getElementById('show-more-skills');
+  const hiddenSkills = document.querySelectorAll('.hidden-skills');
+
+  // Add this 'if' statement to check if the button exists
+  if (toggleButton) {
+    toggleButton.addEventListener('click', () => {
+      hiddenSkills.forEach(container => {
+        container.classList.toggle('visible');
+      });
+
+      // Using optional chaining (?.) for extra safety
+      const isVisible = hiddenSkills[0]?.classList.contains('visible');
+      toggleButton.textContent = isVisible ? 'Show Less' : 'Show More';
+    });
+  }
+</script>
+
+<style>
+    .hidden-skills { display: none; }
+
+    .hidden-skills.visible { display: block; }
+
+    .skill-item {
+        display: flex;
+        align-items: center;
+        gap: 15px; /* Creates space between the logo and the name */
+        margin-bottom: 20px; /* Creates space between each skill item */
+        font-size: 1.1rem;
+    }
+
+    .skill-item img {
+        width: 60px; /* Match the width from the urlFor function */
+        height: 60px;
+        object-fit: contain; /* Ensures the logo is not stretched */
+    }
+</style>

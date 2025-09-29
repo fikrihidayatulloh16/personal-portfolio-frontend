@@ -1,0 +1,74 @@
+---
+// import neccesary file
+import { sanityClient, urlFor } from "../../lib/sanityClient";
+import type { Education, WorkExp } from "../../types/sanity";
+
+//initiate query
+const edQuery = `*[_type == "education"]`;
+const workExpQuery = `*[_type == "workExp"]`;
+
+//fetching queries
+const educationList: Education[] = await sanityClient.fetch(edQuery);
+const workExpList: WorkExp[] = await sanityClient.fetch(workExpQuery);
+
+---
+
+  <!-- Resume Section -->
+  <section id="resume" class="resume section">
+
+    <!-- Section Title -->
+    <div class="container section-title" data-aos="fade-up">
+      <h2>Resume</h2>
+      <p>Here's where i've graduate and work experience. Since i just gradute from my study at Politeknik Negeri Bandung, my experience only from my internship, and i am ready for experience of junior role.</p>
+    </div><!-- End Section Title -->
+
+    <div class="container">
+
+      <div class="row">
+
+        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+          <!--
+          <h3 class="resume-title">Sumary</h3> 
+          <div class="resume-item pb-0">
+            <h4>Brandon Johnson</h4>
+            <p><em>Innovative and deadline-driven Graphic Designer with 3+ years of experience designing and developing user-centered digital/print marketing material from initial concept to final, polished deliverable.</em></p>
+            <ul>
+              <li>Portland par 127,Orlando, FL</li>
+              <li>(123) 456-7891</li>
+              <li>alice.barkley@example.com</li>
+            </ul>
+          </div>
+          -->
+
+          <h3 class="resume-title">Education</h3>
+          
+          {educationList.map((educations) => (
+            <div class="resume-item">
+              <h4>{educations.degree} {educations.major}</h4>
+              <h5>{educations.graduationDate}</h5>
+              <p><em>Institution : {educations.institutionname}</em></p>
+            </div>
+          ))} <!-- Edn Resume Item -->
+        </div>
+
+        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
+          <h3 class="resume-title">Professional Experience</h3>
+
+          {workExpList.map((workExps) => (
+            <div class="resume-item">
+              <h4>{workExps.role}</h4>
+              <h5>{workExps.startDate} - {workExps.endDate}</h5>
+              <p><em>{workExps.companyName} </em></p>
+              <ul>
+                {workExps.description}
+              </ul>
+            </div>
+          ))} <!-- Enn Resume Item -->
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section><!-- /Resume Section -->
