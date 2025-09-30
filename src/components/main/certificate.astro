@@ -20,7 +20,6 @@ const certificateList: Certificate[] = await sanityClient.fetch(certificateQuery
 
 // --- NEW LOGIC FOR UNIQUE CATEGORIES ---
 const allCategories = certificateList.map(cert => cert.category.title).filter(Boolean);
-console.log(allCategories);
 
 const uniqueCategoryTitles = [...new Set(allCategories)];
 
