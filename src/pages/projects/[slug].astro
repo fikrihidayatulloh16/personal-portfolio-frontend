@@ -34,7 +34,7 @@ const projectList: Project = await sanityClient.fetch(query, { slug });
 
 
 // Now 'project' is an object, and this destructuring will work!
-const { title, descriptions, mainImage, imageText, client, category, projectDate, feature, githuburl, endDate } = projectList;
+const { title, descriptions, mainImage, imageText, client, category, projectDate, feature, githuburl, endDate, liveUrl, videourl } = projectList;
 ---
 
 <MainLayout>
@@ -113,7 +113,9 @@ const { title, descriptions, mainImage, imageText, client, category, projectDate
               <li><strong>Category</strong>: {category}</li>
               <li><strong>Client</strong>: {client}</li>
               <li><strong>Project date</strong>: {formatDate(projectDate)} - {formatDate(endDate)}</li>
-              <li><strong>Repository</strong>: <a href={githuburl} target="_blank">Github Repository Project</a></li>
+              {githuburl && (<li><strong>Repository</strong>: <a href={githuburl} target="_blank">Github Repository Project</a></li>)}
+              {liveUrl && (<li><strong>Live URL</strong>: <a href={liveUrl} target="_blank">Live URL/Demo Project</a></li>)}
+              {videourl && (<li><strong>Live URL</strong>: <a href={videourl} target="_blank">Demo video Project</a></li>)}
               <li><strong>Technologies</strong>: 
               {projectList.tech.map((techItem) => (
     

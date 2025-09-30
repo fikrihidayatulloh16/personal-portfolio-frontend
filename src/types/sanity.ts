@@ -100,6 +100,7 @@ export interface Project {
   feature: features[];
   tech: Technologies [];
   githuburl: URL;
+  liveUrl: URL;
 }
 
 export interface Certificate {
