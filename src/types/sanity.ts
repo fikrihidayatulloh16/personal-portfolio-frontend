@@ -91,6 +91,7 @@ export interface Project {
   category: string;
   client: string;
   projectDate:Date;
+  endDate:Date;
   mainImage: SanityImage;
   imageText: string;
   gallery: ProjectGalery[];

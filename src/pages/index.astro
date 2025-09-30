@@ -13,14 +13,9 @@ import Certifiacte from "../components/main/certificate.astro";
 import Contact from "../components/main/contact.astro";
 
 // 2. Define the GROQ query to fetch our data.
-// We ask for the one document of type "pageInfo" and select the fields we want.
 const query = `*[_type == "pageInfo"][0]{ name, backroundImage }`;
 
-
-
-
 // 3. Fetch the data from Sanity using the client and the query.
-// The "---" section is called the frontmatter, it runs on the server.
 const pageInfo: PageInfo = await sanityClient.fetch(query);
 
 const { name, backroundImage } = pageInfo;
@@ -55,9 +50,6 @@ const { name, backroundImage } = pageInfo;
     <Certifiacte />
 
   <!-- Contact Section -->
-    
+    <Contact />
 
-  <style>
-
-  </style>
 </MainLayout>

@@ -2,7 +2,7 @@
 // import neccesary file
 import { sanityClient, urlFor } from "../../lib/sanityClient";
 import type { Education, WorkExp } from "../../types/sanity";
-
+import { formatDate } from "../../utils/dateFormatter";
 //initiate query
 const edQuery = `*[_type == "education"]`;
 const workExpQuery = `*[_type == "workExp"]`;
@@ -57,7 +57,7 @@ const workExpList: WorkExp[] = await sanityClient.fetch(workExpQuery);
           {workExpList.map((workExps) => (
             <div class="resume-item">
               <h4>{workExps.role}</h4>
-              <h5>{workExps.startDate} - {workExps.endDate}</h5>
+              <h5>{formatDate(workExps.startDate)} - {formatDate(workExps.endDate)}</h5>
               <p><em>{workExps.companyName} </em></p>
               <ul>
                 {workExps.description}
